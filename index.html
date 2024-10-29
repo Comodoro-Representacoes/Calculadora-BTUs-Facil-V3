@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de BTUs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        label {
+            margin-top: 10px;
+            display: block;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #e9ecef;
+        }
+        .refazer {
+            margin-top: 10px;
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo" style="display: block; margin: 0 auto; width: 100%; max-width: 200px; margin-bottom: 20px;">
+        <h2>Calculadora de BTUs de Ar Condicionado</h2>
+        
+        <!-- Formulário de entrada -->
+        <label>Largura do Ambiente (m):</label>
+        <input type="number" id="largura" value="0" min="0" placeholder="Ex: 5">
+        
+        <label>Altura do Ambiente (m):</label>
+        <input type="number" id="altura" value="0" min="0" placeholder="Ex: 3">
+        
+        <label>Comprimento do Ambiente (m):</label>
+        <input type="number" id="comprimento" value="0" min="0" placeholder="Ex: 6">
+        
+        <label>Número de Pessoas:</label>
+        <input type="number" id="pessoas" value="0" min="0" placeholder="Ex: 3">
+        
+        <label>Número de Aparelhos Eletrônicos (computadores, televisores, etc.):</label>
+        <input type="number" id="eletronicos" value="0" min="0" placeholder="Ex: 2">
+        
+        <label>Exposição ao Sol:</label>
+        <select id="exposicao">
+            <option value="0">Nenhuma</option>
+            <option value="5">Parcial (luz indireta ou parte do dia)</option>
+            <option value="10">Direta (muita luz e calor)</option>
+        </select>
+        
+        <button onclick="calcularBTU()">Calcular BTUs</button>
+        <button id="refazer" onclick="refazerCalculo()" style="display:none;" class="refazer">Refazer Cálculo</button>
+        
+        <div id="resultado" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        function calcularBTU() {
+            var largura = parseFloat(document.getElementById('largura').value);
+            var altura = parseFloat(document.getElementById('altura').value);
+            var comprimento = parseFloat(document.getElementById('comprimento').value);
+            var pessoas = parseFloat(document.getElementById('pessoas').value);
+            var eletronicos = parseFloat(document.getElementById('eletronicos').value);
+            var exposicao = parseFloat(document.getElementById('exposicao').value);
+
+            var area = largura * altura * comprimento;
+            var btuBase = area * 600;
+
+            var totalBTUs = btuBase + (pessoas * 600) + (eletronicos * 400) + exposicao;
+            totalBTUs = arredondarBTU(totalBTUs);
+
+            var alternativas = calcularAlternativas(totalBTUs);
+
+            document.getElementById('resultado').style.display = 'block';
+            document.getElementById('resultado').innerHTML = `Resultado: ${totalBTUs} BTUs<br>${alternativas}`;
+            document.getElementById('refazer').style.display = 'block';
+        }
+
+        function arredondarBTU(valor) {
+            var potencias = [56000, 36000, 30000, 24000, 18000, 12000, 9000];
+            for (var i = 0; i < potencias.length; i++) {
+                if (valor <= potencias[i]) {
+                    return potencias[i];
+                }
+            }
+            return potencias[potencias.length - 1];
+        }
+
+        function calcularAlternativas(valor) {
+            var alternativas = "";
+
+            // Somente inclui alternativas com duas unidades se o valor total permitir
+            if (valor == 18000) alternativas += "<br>Ou 2 unidades de 9.000 BTUs.";
+            if (valor == 24000) alternativas += "<br>Ou 2 unidades de 12.000 BTUs.";
+            if (valor == 36000) alternativas += "<br>Ou 2 unidades de 18.000 BTUs.";
+            if (valor == 56000) alternativas += "<br>Ou 2 unidades de 30.000 BTUs.";
+
+            // Exibe "Sem alternativas" apenas se não houver opções viáveis
+            if (!alternativas) return "";
+            return alternativas;
+        }
+
+        function refazerCalculo() {
+            document.getElementById('resultado').style.display = 'none';
+            document.getElementById('refazer').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
